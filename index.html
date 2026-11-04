@@ -3,28 +3,267 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>novazlab</title>
+<title>novazlab — Indie Mobile Games</title>
+<meta name="description" content="novazlab is an independent mobile game studio. Play Magnet Shift, a one-touch magnetic puzzle-action game, free on Google Play.">
+<meta property="og:title" content="Magnet Shift by novazlab">
+<meta property="og:description" content="Tap. Attract. Escape. A one-touch magnetic puzzle-action game with 50 levels and 5 heroes.">
+<meta property="og:image" content="https://novazlabstudio.github.io/img/heroes.jpg">
+<meta property="og:url" content="https://novazlabstudio.github.io/">
+<meta name="theme-color" content="#07061a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: dark; }
-  body { margin: 0; background: #0b0a1e; color: #dfe6ff; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width: 640px; margin: 0 auto; padding: 48px 16px; }
-  h1 { margin: 0 0 4px; font-size: 32px; color: #7fe3ff; }
-  p.tag { margin: 0 0 32px; color: #8a93b8; }
-  .game { background: #15143a; border-left: 3px solid #00d4ff; padding: 16px 20px; margin-bottom: 16px; }
-  .game h2 { margin: 0 0 6px; font-size: 20px; }
-  a { color: #7fe3ff; }
+  :root {
+    --bg: #07061a;
+    --bg-2: #0e0c2a;
+    --card: #131137;
+    --line: rgba(120, 200, 255, 0.14);
+    --text: #e3e8ff;
+    --muted: #96a0c8;
+    --cyan: #3fe0ff;
+    --magenta: #d35cff;
+    --orange: #ff7a1a;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    overflow-x: hidden;
+  }
+  /* Arka plan: oyundaki gibi ince ızgara + renkli ışık lekeleri */
+  body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: -2;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 75%);
+    opacity: 0.5;
+  }
+  .glow { position: absolute; z-index: -1; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; }
+  .glow.a { width: 520px; height: 520px; background: #1a6bff; top: -160px; left: -160px; }
+  .glow.b { width: 460px; height: 460px; background: #a52bff; top: 120px; right: -180px; }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; position: relative; }
+
+  /* Üst çubuk */
+  header { padding: 22px 0; }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { font-family: "Orbitron", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 0.06em; color: var(--text); }
+  .brand span { color: var(--cyan); }
+  nav { display: flex; gap: 22px; font-size: 15px; }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+
+  /* Hero bölümü */
+  .hero { padding: 40px 0 72px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  .eyebrow { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cyan); background: rgba(63, 224, 255, 0.08); border: 1px solid rgba(63, 224, 255, 0.25); padding: 6px 12px; border-radius: 999px; }
+  h1 {
+    font-family: "Orbitron", sans-serif; font-weight: 800;
+    font-size: clamp(44px, 7vw, 84px); line-height: 1.02; letter-spacing: 0.04em;
+    margin: 20px 0 10px;
+  }
+  h1 .m { color: #8ff0ff; text-shadow: 0 0 18px rgba(0, 160, 255, 0.75), 0 0 2px #0a3a66; }
+  h1 .s { display: block; color: #fff; text-shadow: 0 0 18px rgba(211, 92, 255, 0.8); }
+  .tagline { font-family: "Orbitron", sans-serif; font-weight: 600; color: #9fb4ff; letter-spacing: 0.18em; text-transform: uppercase; font-size: 15px; margin: 0 0 20px; }
+  .lead { color: var(--muted); font-size: 18px; max-width: 520px; margin: 0 0 30px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .play-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: linear-gradient(135deg, #1fd2ff, #6b6bff);
+    color: #05051a; font-weight: 600; padding: 14px 22px; border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(31, 210, 255, 0.35);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .play-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(31, 210, 255, 0.5); text-decoration: none; }
+  .play-btn svg { width: 22px; height: 22px; }
+  .play-btn small { display: block; font-size: 11px; font-weight: 500; opacity: 0.8; line-height: 1.1; }
+  .play-btn b { display: block; font-size: 17px; line-height: 1.2; }
+  .ghost { color: var(--muted); font-size: 15px; }
+
+  /* Telefon çerçevesi */
+  .phone {
+    position: relative; width: 100%; max-width: 300px; aspect-ratio: 720 / 1560;
+    border-radius: 34px; padding: 10px;
+    background: linear-gradient(160deg, #2a2a52, #0d0c26);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 60px rgba(63, 224, 255, 0.15);
+  }
+  .phone img { width: 100%; height: 100%; object-fit: cover; border-radius: 26px; display: block; }
+  .hero .phone { margin: 0 auto; transform: rotate(3deg); }
+  .hero .phone.back { position: absolute; max-width: 250px; right: 4%; top: 12%; transform: rotate(-8deg); opacity: 0.55; filter: saturate(0.9); z-index: -1; }
+  .stage { position: relative; }
+
+  /* Bölümler */
+  section { padding: 72px 0; }
+  h2 { font-family: "Orbitron", sans-serif; font-weight: 800; font-size: clamp(26px, 3.4vw, 38px); letter-spacing: 0.04em; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 36px; max-width: 640px; }
+
+  .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .shots .phone { max-width: none; border-radius: 28px; padding: 8px; }
+  .shots .phone img { border-radius: 21px; }
+  .shots figure { margin: 0; }
+  .shots figcaption { text-align: center; color: var(--muted); font-size: 14px; margin-top: 12px; }
+
+  .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .feature { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 22px; position: relative; overflow: hidden; }
+  .feature::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px; background: var(--accent, var(--cyan)); }
+  .feature .icon { font-size: 28px; margin-bottom: 10px; }
+  .feature h3 { margin: 0 0 6px; font-size: 18px; }
+  .feature p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  .heroes-band { background: linear-gradient(180deg, transparent, rgba(255, 122, 26, 0.06), transparent); }
+  .heroes-img { width: 100%; max-width: 760px; border-radius: var(--radius); border: 1px solid var(--line); display: block; margin: 0 auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45); }
+  .blaze { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 44px; align-items: center; margin-top: 56px; }
+  .portrait {
+    width: 280px; height: 280px; margin: 0 auto; border-radius: 50%;
+    display: grid; place-items: center; overflow: hidden;
+    background: radial-gradient(circle, #2a0f0a 0%, #140a0d 70%);
+    box-shadow: 0 0 0 2px rgba(255, 122, 26, 0.45), 0 0 80px rgba(255, 122, 26, 0.35);
+  }
+  .portrait img { width: 260px; height: 250px; display: block; }
+  .blaze h3 { font-family: "Orbitron", sans-serif; font-size: 26px; margin: 0 0 10px; color: #ffb066; }
+  .blaze p { color: var(--muted); margin: 0 0 12px; }
+
+  .studio { text-align: center; }
+  .studio p { color: var(--muted); max-width: 620px; margin: 0 auto 10px; }
+  .soon { display: inline-block; margin-top: 18px; padding: 8px 16px; border: 1px dashed rgba(211, 92, 255, 0.5); border-radius: 999px; color: #e0a8ff; font-size: 14px; }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 0 40px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; }
+  footer nav { gap: 18px; }
+
+  /* Tablet ve telefon */
+  @media (max-width: 900px) {
+    .hero .wrap { grid-template-columns: 1fr; text-align: center; }
+    .lead { margin-left: auto; margin-right: auto; }
+    .cta { justify-content: center; }
+    .hero .phone { max-width: 260px; }
+    .hero .phone.back { display: none; }
+    .features { grid-template-columns: repeat(2, 1fr); }
+    .shots { grid-template-columns: repeat(4, 64%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+    .shots figure { scroll-snap-align: center; }
+    .blaze { grid-template-columns: 1fr; text-align: center; }
+  }
+  @media (max-width: 560px) {
+    nav.top { display: none; }
+    .features { grid-template-columns: 1fr; }
+    section { padding: 56px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .play-btn { transition: none; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>novazlab</h1>
-  <p class="tag">Independent mobile game studio</p>
-  <div class="game">
-    <h2>Magnet Shift</h2>
-    <p>A one-touch magnetic puzzle-action game.</p>
-    <a href="https://play.google.com/store/apps/details?id=com.novazlabstudio.magnetshift">Get it on Google Play</a>
-    · <a href="https://novazlabstudio.github.io/magnet_shift_policy/">Privacy Policy</a>
+<div class="glow a"></div>
+<div class="glow b"></div>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#">novaz<span>lab</span></a>
+    <nav class="top">
+      <a href="#game">Magnet Shift</a>
+      <a href="#heroes">Heroes</a>
+      <a href="#studio">Studio</a>
+    </nav>
   </div>
+</header>
+
+<main>
+  <section class="hero" id="game">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Now on Google Play</span>
+        <h1><span class="m">MAGNET</span><span class="s">SHIFT</span></h1>
+        <p class="tagline">Tap · Attract · Escape</p>
+        <p class="lead">Hold a magnet to pull your hero through the air, switch magnets mid-flight to slip past lasers and guards, and reach the exit portal. One finger, 50 handcrafted levels.</p>
+        <div class="cta">
+          <a class="play-btn" href="https://play.google.com/store/apps/details?id=com.novazlabstudio.magnetshift">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 3.5v17a1 1 0 0 0 1.5.86l14-8.5a1 1 0 0 0 0-1.72l-14-8.5A1 1 0 0 0 6 3.5z"/></svg>
+            <span><small>GET IT ON</small><b>Google Play</b></span>
+          </a>
+          <span class="ghost">Free · Android</span>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="phone back"><img src="img/level6.jpg" alt="" loading="lazy"></div>
+        <div class="phone"><img src="img/menu.jpg" alt="Magnet Shift main menu with five heroes to choose from"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screens">
+    <div class="wrap">
+      <h2>Pull. Swing. Dodge.</h2>
+      <p class="sub">Every level is a vertical climb. Pick the right magnet at the right moment — one wrong pull and you fly straight into a laser.</p>
+      <div class="shots">
+        <figure><div class="phone"><img src="img/level1.jpg" alt="Level 1: the hero pulled toward a magnet on a bright sky level" loading="lazy"></div><figcaption>Learn the pull</figcaption></figure>
+        <figure><div class="phone"><img src="img/level6.jpg" alt="Level 6: Shadow hero pulled past lasers and a guard" loading="lazy"></div><figcaption>Dodge lasers &amp; guards</figcaption></figure>
+        <figure><div class="phone"><img src="img/level10.jpg" alt="Level 10: Blaze hero pulled up toward a magnet" loading="lazy"></div><figcaption>Climb higher</figcaption></figure>
+        <figure><div class="phone"><img src="img/blaze.jpg" alt="Unlock Blaze screen showing ad progress" loading="lazy"></div><figcaption>Unlock new heroes</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Why you'll keep playing</h2>
+      <p class="sub">Short levels for quick breaks, with enough challenge to bring you back.</p>
+      <div class="features">
+        <div class="feature" style="--accent: var(--cyan)"><div class="icon">🧲</div><h3>One-touch control</h3><p>Tap and hold any magnet. Let go, pick another, keep the momentum.</p></div>
+        <div class="feature" style="--accent: #4dff88"><div class="icon">🗺️</div><h3>50 levels</h3><p>From a gentle first climb to tall towers packed with lasers and guards.</p></div>
+        <div class="feature" style="--accent: var(--magenta)"><div class="icon">⭐</div><h3>Stars &amp; coins</h3><p>Collect every coin for three stars. Every 5 coins earns an extra life.</p></div>
+        <div class="feature" style="--accent: var(--orange)"><div class="icon">🎬</div><h3>Fair ads only</h3><p>No forced interruptions — ads are optional, only when you want a reward.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="heroes-band" id="heroes">
+    <div class="wrap">
+      <h2>Choose your hero</h2>
+      <p class="sub">Start as Cyborg or Pink, unlock Shadow and Mech as you climb, and earn the fiery Blaze.</p>
+      <img class="heroes-img" src="img/heroes.jpg" alt="The five heroes: Cyborg, Pink, Shadow, Mech and Blaze" loading="lazy">
+      <div class="blaze">
+        <div class="portrait"><img src="img/blaze_portrait.jpg" alt="Blaze, a crimson armored robot with a crest of flames and jet boots" loading="lazy"></div>
+        <div>
+          <h3>🔥 Meet Blaze</h3>
+          <p>Crimson armor, a crest of flames and jet boots that roar to life whenever a magnet pulls him in.</p>
+          <p>Blaze is unlocked by watching three short optional ads — your progress is saved after every one, so you can take your time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="studio" id="studio">
+    <div class="wrap">
+      <h2>About novazlab</h2>
+      <p>novazlab is an independent mobile game studio making small, polished games that are easy to pick up and hard to put down.</p>
+      <p>Questions or feedback? Write to <a href="mailto:novazlabstudio@gmail.com">novazlabstudio@gmail.com</a>.</p>
+      <span class="soon">More games coming soon</span>
+    </div>
+  </section>
 </main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 novazlab</span>
+    <nav>
+      <a href="https://play.google.com/store/apps/details?id=com.novazlabstudio.magnetshift">Google Play</a>
+      <a href="magnet_shift_policy/">Privacy Policy</a>
+      <a href="mailto:novazlabstudio@gmail.com">Contact</a>
+    </nav>
+  </div>
+</footer>
 </body>
 </html>
